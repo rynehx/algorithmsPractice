@@ -69,7 +69,7 @@ DynamicArray.prototype.sizeUp = function(){
 };
 
 DynamicArray.prototype.sizeDown = function(){
-  var newArray = new Array(this.size*Math.floor(1/2));
+  var newArray = new Array(this.size*2);
   for(var i = 0; i< this.size;i++){
     newArray[i] = this.store[this.wrap(i+this.shift)];
   }
