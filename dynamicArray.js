@@ -6,7 +6,7 @@ var DynamicArray = function(){
 
 
 DynamicArray.prototype.get = function(idx){
-  if(idx<= this.length-1){
+  if(idx<= this.size-1){
     return this.store[this.wrap(idx+this.shift)];
   }else{
     console.log("bad index");
@@ -14,7 +14,12 @@ DynamicArray.prototype.get = function(idx){
 };
 
 DynamicArray.prototype.wrap = function(idx){
-  return idx%(this.store.length);
+  var res = (idx%(this.store.length));
+  if (res<0){
+    return res+this.store.length;
+  }else{
+    return res;
+  }
 };
 
 
@@ -24,7 +29,7 @@ DynamicArray.prototype.set = function(idx,val){
 
 };
 
-DynamicArray.prototype.shift = function(){
+DynamicArray.prototype.shifts = function(){
   this.resize();
   var val = this.store[this.wrap(this.shift)];
   this.size-=1;
@@ -34,7 +39,7 @@ DynamicArray.prototype.shift = function(){
 
 DynamicArray.prototype.unshift = function(val){
   this.resize();
-  this.store[this.wrap(this.shift-1)]=val;
+  this.store[this.wrap(this.store.length-1+this.shift)]=val;
   this.size+=1;
   this.shift-=1;
 };
@@ -58,6 +63,7 @@ DynamicArray.prototype.sizeUp = function(){
   for(var i = 0; i< this.size;i++){
     newArray[i] = this.store[this.wrap(i+this.shift)];
   }
+
   this.shift = 0;
   this.store = newArray;
 };
@@ -72,7 +78,8 @@ DynamicArray.prototype.sizeDown = function(){
 };
 
 DynamicArray.prototype.resize = function(){
-  if(this.size === this.store.length){
+
+  if(this.size >= this.store.length){
     this.sizeUp();
   }else if(this.size>10 &&  this.size === Math.floor(this.store.length/4)){
     this.sizeDown();
@@ -90,8 +97,25 @@ console.log(array.store);
 array.pop();
 array.pop();
 array.pop();
-array.get(1);
-console.log(array.pop());
+
+array.unshift(5);
+array.unshift(6);
+array.unshift(7);
+array.unshift(8);
+array.unshift(9);
+array.unshift(10);
+array.unshift(11);
+array.unshift(12);
+array.unshift(13);
+array.unshift(14);
+array.shifts();
+array.shifts();
+array.shifts();
+array.shifts();
+array.shifts();
+console.log(array.get(0));
+
+
 // array.push(5);
 // array.push(6);
 // array.push(7);
