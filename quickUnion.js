@@ -31,4 +31,23 @@ QuickUnion.prototype.connected = function(n1, n2){
 };
 
 
-var set = new QuickUnion(10);
+var search = new QuickUnion(10);
+console.log(search.store);
+search.union(7,6);
+console.log(search.store);
+search.union(2,1);
+console.log(search.store);
+search.union(4,9);
+console.log(search.store);
+search.union(7,0);
+console.log(search.store);
+search.union(6,8);
+console.log(search.store);
+search.union(4,2);
+console.log(search.store);
+search.union(8,5);
+console.log(search.store);
+search.union(5,2);
+console.log(search.store);
+search.union(3,1);
+console.log(search.store);
