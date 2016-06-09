@@ -1,24 +1,34 @@
+//quick union set joining
+//uses forrest
+//union append the second object to the root of the first object
+//root is slow O(n) long tree
 
 
-var FastUnionTree = function(size){
+var QuickUnion = function(size){
   this.store = new Array(size);
-  this.store.each(function(el,i){
-    this.store[i] = i;
-  });
+  for (var i =0; i < this.store.length; i++){
+    this.store[i]=i;
+  }
 };
 
 
-FastUnionTree.prototype.union = function(idx1, idx2){
-
+QuickUnion.prototype.union = function(idx1, idx2){
+  this.store[this.root(idx2)]= this.root(idx1);
 };
 
 
-FastUnionTree.prototype.root = function(idx){
+QuickUnion.prototype.root = function(idx){
   var parentIdx = this.store[idx];
   if(parentIdx===idx){
     return idx;
   }else{
     return this.root(parentIdx);
   }
-
 };
+
+QuickUnion.prototype.connected = function(n1, n2){
+  return this.root(n1) === this.root(n2);
+};
+
+
+var set = new QuickUnion(10);
