@@ -1,8 +1,8 @@
-var getMin = function(arr){
-  if(this.store[arr[0]]>this.store[arr[1]]){
-    return [this.store[arr[1]], arr[1]];
+var getMin = function(arr,store){
+  if(store[arr[0]]>store[arr[1]]){
+    return [store[arr[1]], arr[1]];
   }else{
-    return [this.store[arr[0]], arr[0]];
+    return [store[arr[0]], arr[0]];
   }
 };
 
@@ -47,8 +47,9 @@ Heap.prototype.max = function(){
 Heap.prototype.removeMin = function(){
   if(this.type === "min"){
     var min = this.store[0];
-    this.store[0] = this.store[this.length()].pop();
+    this.store[0] = this.store.pop();
     this.heapifyDown(0);
+    return min;
   }else{
     console.log("this is a max heap!");
   }
@@ -58,7 +59,7 @@ Heap.prototype.removeMin = function(){
 Heap.prototype.removeMax = function(){
   if(this.type === "max"){
     var max = this.store[0];
-    this.store[0] = this.store[this.length()].pop();
+    this.store[0] = this.store.pop();
     this.heapifyDown(0);
     return max;
   }else{
@@ -70,6 +71,7 @@ Heap.prototype.removeMax = function(){
 Heap.prototype.insert = function(val){
   this.store.push(val);
   this.heapifyUp(this.length()-1);
+  return val;
 };
 
 
@@ -94,25 +96,26 @@ Heap.prototype.heapifyUp = function(idx){
 };
 
 Heap.prototype.heapifyDown = function(idx){
-
-  if(this.type==="min"){
-    var child = getMin(this.children(idx));
-    if(this.store[idx]>child[0]){
-      var current = this.store[idx];
-      this.store[idx] = child[0];
-      this.store[child[1]] = current;
-      this.heapifyDown(child[1]);
+  if(this.store[idx]){
+    if(this.type==="min"){
+      var child = getMin(this.children(idx),this.store);
+      if(this.store[idx]>child[0]){
+        var current = this.store[idx];
+        this.store[idx] = child[0];
+        this.store[child[1]] = current;
+        this.heapifyDown(child[1]);
+      }
+    }else if(this.type==="max"){
+      var child = getMax(this.children[idx],this.store);
+      if(this.store[idx]<child[0]){
+        var current = this.store[idx];
+        this.store[idx] = child[0];
+        this.store[child[1]] = current;
+        this.heapifyDown(child[1]);
+      }
+    }else{
+      console.log("heap type error!");
     }
-  }else if(this.type==="max"){
-    var child = getMax(this.children[idx]);
-    if(this.store[idx]<child[0]){
-      var current = this.store[idx];
-      this.store[idx] = child[0];
-      this.store[child[1]] = current;
-      this.heapifyDown(child[1]);
-    }
-  }else{
-    console.log("heap type error!");
   }
 };
 
@@ -126,24 +129,39 @@ Heap.prototype.children = function(i){
   return [2*i+1, 2*i+2];
 };
 
+Heap.prototype.visual = function(){
+  var out = {};
 
+  var _subVisual = function(idx,depth){
+    if(this.store[idx]){ // if i exist than I will save myself and call my children
+      if(!out[depth]){out[depth]="";}
+      out[depth]+=" "+this.store[idx]+" ";
+
+      var children = this.children(idx);
+      _subVisual(children[0],depth+1);
+      _subVisual(children[1],depth+1);
+    }
+  }.bind(this);
+  _subVisual(0,0);
+
+  return out;
+};
 
 var heap = new Heap("min");
+for(var i =0; i<100;i++){
+  heap.insert(Math.floor(Math.random()*20));
+}
 
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-heap.insert(Math.floor(Math.random()*30));
-console.log(heap.store);
+heap.visual();
+
+for(var i =0; i<100;i++){
+  console.log(heap.removeMin());
+}
+
+
+
+
+
+
+
+console.log(heap.visual());
