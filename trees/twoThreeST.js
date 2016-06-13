@@ -1,4 +1,4 @@
-var TreeNode = function(key,content,leftChild,rightChild, parent){
+var TreeNode = function(key,content,leftChild,rightChild, parent, tree){
 
   this.type = 2;
 
@@ -13,6 +13,8 @@ var TreeNode = function(key,content,leftChild,rightChild, parent){
   this.parent = parent;
   this.leftChild = leftChild;
   this.rightChild = rightChild;
+
+  this.tree = tree;
   // this.midChild = null;
 
   // this.midRightChild = null;
@@ -116,8 +118,11 @@ TreeNode.prototype.process3 = function(key, content){
       this.contentMid = content;
     }
 
-    this.parent.handleSplit(this);
-
+    if(this.parent){
+      this.parent.handleSplit(this);
+    }else{
+      this.makeRoot();
+    }
   }
 };
 
@@ -132,21 +137,57 @@ TreeNode.prototype.handleSplit = function(child){
       //right and left child
       this.midChild = child;
       this.leftChild =  child.split(this);
-
-      //split!
-
-
     }else{
       this.addRightVal(child.keyMid,child.contentMid);
       //right and left child
       this.midChild = child.split(this);
       this.rightChild =  child;
-
     }
 
 
-  }else{ // if node is 3 branches
-    
+  }else{ // if node is 3 branch
+
+    if(this.leftChild === child){
+      this.keyMid = this.keyLeft;
+      this.contentMid = this.contentLeft;
+      this.keyLeft = child.keyMid;
+      this.contentLeft = child.contentMid;
+
+      this.midRightChild = this.midChild;
+      this.midLeftChild = child;
+      this.leftChild = child.split(this);
+
+      this.midChild = undefined;
+
+    }else if(this.midChild === child){
+
+      this.keyMid = child.keyMid;
+      this.contentMid = child.contentMid;
+
+      this.midRightChild = child;
+      this.midLeftChild =   child.split(this);
+      this.midChild = undefined;
+
+    }else if(this.rightChild === child){
+
+      this.keyMid = this.keyRight;
+      this.contentMid = this.contentRight;
+      this.keyRight = child.keyMid;
+      this.contentRight = child.contentMid;
+
+
+      this.midLeftChild = this.midChild;
+      this.rightChild = child;
+      this.midRightChild = child.split(this);
+      this.midChild = undefined;
+
+    }
+
+    if(this.parent){
+      this.parent.handleSplit(this);
+    }else{
+      this.makeRoot();
+    }
 
     //check parent and recurse
   }
@@ -158,22 +199,48 @@ TreeNode.prototype.handleSplit = function(child){
 };
 
 
+TreeNode.prototype.makeRoot = function(){
+    var newRoot = new TreeNode(this.keyMid,this.contentMid, undefined, undefined, undefined, this.tree);
+
+    newRoot.rightChild = this;
+    newRoot.leftChild = this.split(newRoot);
+    this.tree.root = newRoot;
+
+};
+
+
 TreeNode.prototype.split = function(parent){
   var newNode = new TreeNode(this.keyLeft,this.contentLeft,this.leftChild,this.midLeftChild,parent); // new left -- original is right
   this.key = this.keyRight;
   this.content = this.contentRight;
   this.leftChild = this.midRightChild;
   this.type = 2;
+  this.parent = parent;
 
-  this.keyRight = undefined;
-  this.keyLeft = undefined;
-  this.midRightChild = undefined;
-  this.midLeftChild = undefined;
-  this.keyMid = undefined;
-  this.contentMid =  undefined;
 
-  return this;
+  // this.keyRight = undefined;
+  // this.keyLeft = undefined;
+  // this.contentRight = undefined;
+  // this.contentLeft = undefined;
+  // this.midRightChild = undefined;
+  // this.midLeftChild = undefined;
+  // this.keyMid = undefined;
+  // this.contentMid =  undefined;
+
+  delete this.keyRight;
+  delete this.keyLeft;
+  delete this.contentRight;
+  delete this.contentLeft;
+  delete this.midRightChild;
+  delete this.midLeftChild;
+  delete this.keyMid;
+  delete this.contentMid;
+
+
+  return newNode;
 };
+
+
 
 
 
@@ -181,8 +248,10 @@ var TwoThreeST = function(){
   this.root;
 };
 
+
+
 TwoThreeST.prototype.insert = function(key,obj){
-  var newNode = new TreeNode(key,obj);
+  var newNode = new TreeNode(key, obj, undefined, undefined, undefined, this);
 
   if(!this.root){
     this.root = newNode;
@@ -196,14 +265,20 @@ TwoThreeST.prototype.insert = function(key,obj){
 };
 
 
+var tree = new TwoThreeST();
 
+tree.insert(5, {content: "i am a object"});
+tree.insert(2, {content: "i am a object"});
+tree.insert(7, {content: "i am a object"});
+  console.log(tree)
 
-
-TwoThreeST.prototype.find = function(){
-
-};
-
-
-TwoThreeST.prototype.Delete = function(){
-
-};
+//
+//
+// TwoThreeST.prototype.find = function(){
+//
+// };
+//
+//
+// TwoThreeST.prototype.Delete = function(){
+//
+// };
