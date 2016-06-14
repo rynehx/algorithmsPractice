@@ -191,6 +191,7 @@ TreeNode.prototype.handleSplit = function(child){
 
     //check parent and recurse
   }
+
   //make into 4 branch node
   // join the split nodes onto the for branch by checking this (left, mid, or right)
   //check if parent exists or is 2 or 3 branch
@@ -204,6 +205,7 @@ TreeNode.prototype.makeRoot = function(){
 
     newRoot.rightChild = this;
     newRoot.leftChild = this.split(newRoot);
+
     this.tree.root = newRoot;
 
 };
@@ -270,6 +272,15 @@ var tree = new TwoThreeST();
 tree.insert(5, {content: "i am a object"});
 tree.insert(2, {content: "i am a object"});
 tree.insert(7, {content: "i am a object"});
+ tree.insert(9, {content: "i am a object"});
+ tree.insert(8, {content: "i am a object"});
+ tree.insert(10, {content: "i am a object"});
+tree.insert(15, {content: "i am a object"});
+// tree.insert(16, {content: "i am a object"});
+// tree.insert(14, {content: "i am a object"});
+// tree.insert(13, {content: "i am a object"});
+// tree.insert(12, {content: "i am a object"});
+// tree.insert(17, {content: "i am a object"});
   console.log(tree)
 
 //
