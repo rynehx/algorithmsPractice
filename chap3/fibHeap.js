@@ -80,24 +80,30 @@ FibonacciHeap.prototype.takeMin = function(){
   if(this.min){
     var min = this.min; //hold it since we are gonna remove it from the root;
 
-    min.child.next.previous = min.previous;//join min children to root
-    min.previous.next = min.child.next;
-    min.child.next = min;
-    min.previous = min.child;
+    if(this.min.child){
+      min.child.next.previous = min.previous;//join min children to root
+      min.previous.next = min.child.next;
+      min.child.next = min;
+      min.previous = min.child;
+
+      while(min.child.parent){ //remove parent property from child
+        min.child.parent = undefined;
+        min.child = min.child.next;
+      }
+    }
 
     min.previous.next = min.next; //remove min;
     min.next.previous = min.previous;
 
-    while(min.child.parent){ //remove parent property from child
-      min.child.parent = undefined;
-      min.child = min.child.next;
-    }
+
 
 
     if(min === min.next){
       this.min = undefined;
     }else{
+
       this.min = min.next;
+
       this.consolidate();
     }
     this.n-=1;
@@ -109,47 +115,84 @@ FibonacciHeap.prototype.takeMin = function(){
 
 
 FibonacciHeap.prototype.consolidate = function(){
-  var degreeCheck = new Array(Math.pow(2, Math.round(Math.log2(10)))); // allocate array size D(H.n)
-  var current = this.min.next;
-  var ending = this.min;
-  degreeCheck[ending.degree] = ending; // set first element into the degree aray
+  var newMin = this.min;
+
+  var degreeCheck = new Array(Math.floor(Math.log2(1))+1); // allocate array size D(H.n)
+  var current = this.min;
+
+
   //and set while loop until the root loops back
-  while(current!==ending){
+  while(degreeCheck[current.degree]!== current){
+
+    var next = current.next;
+
     if(degreeCheck[current.degree]){
 
       var pastRoot = degreeCheck[current.degree];
-      degreeCheck[current.degree] = undefined;
+      delete degreeCheck[current.degree];
       if(pastRoot.key < current.key){
 
-        pastRoot.appendChild(current);
-
-      }else{
-        current.appendChild(pastRoot);
+        current.next.previous = current.previous;//severe root from root list
+        current.previous.next = current.next;
         pastRoot.next.previous = pastRoot.previous;//severe root from root list
         pastRoot.previous.next = pastRoot.next;
+
+        pastRoot.next = next;
+        pastRoot.previous = next.previous;
+        next.previous.next = pastRoot;
+        next.previous = pastRoot;
+
+        pastRoot.appendChild(current);
+        current = pastRoot;
+
+      }else{
+        pastRoot.next.previous = pastRoot.previous;//severe root from root list
+        pastRoot.previous.next = pastRoot.next;
+        current.appendChild(pastRoot);
       }
 
     }else{
+      if(current.key<newMin.key){
+        newMin = current;
+      }
       degreeCheck[current.degree] = current;
-      current = current.next;
+      current = next;
     }
   }
 
+  this.min = newMin;
 };
 
 
-FibonacciHeap.prototype.appendChild = function(child){
+FibHeapNode.prototype.appendChild = function(child){
   if(this.child){
-
     child.next = this.child;//join onto child of the new parent
     child.previous = this.child.previous;
     this.child.previous.next = child;
     this.child.previous = child;
-    child.parent = this;
-
   }else{ // if parent has no child then add the new child
     this.child = child;
+    child.next = child;
+    child.previous = child;
   }
-  this.degree += child.degree+1;//increment parent degree
+  child.parent = this;
   child.mark = false;//mark all added node false;
+  this.degree += 1;//increment parent degree
+
 };
+
+
+var heap = new FibonacciHeap();
+  heap.insert(1,{});
+
+  for(var i = 1; i < 100000; i++){
+    heap.insert(i,i+" key");
+  }
+
+  for(var i = 1; i < 100000; i++){
+    console.log(heap.takeMin().key);
+  }
+
+
+
+console.log(heap.min)
