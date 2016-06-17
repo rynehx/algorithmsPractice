@@ -34,12 +34,12 @@ FibonacciHeap.prototype.insert = function(key, content){
     this.min.previous.next = newNode;
     this.min.previous = newNode;
 
-    if(newNode.key<this.min.key){//replace old min
+    if(newNode.key<=this.min.key){//replace old min
       this.min = newNode;
     }
   }
   this.n+=1;//increment number of node in heap
-
+  return newNode;
 };
 
 
@@ -77,6 +77,7 @@ FibonacciHeap.union = function(heap1, heap2){
 
 
 FibonacciHeap.prototype.takeMin = function(){
+
   if(this.min){
     var min = this.min; //hold it since we are gonna remove it from the root;
 
@@ -101,9 +102,7 @@ FibonacciHeap.prototype.takeMin = function(){
     if(min === min.next){
       this.min = undefined;
     }else{
-
       this.min = min.next;
-
       this.consolidate();
     }
     this.n-=1;
@@ -116,10 +115,8 @@ FibonacciHeap.prototype.takeMin = function(){
 
 FibonacciHeap.prototype.consolidate = function(){
   var newMin = this.min;
-
   var degreeCheck = new Array(Math.floor(Math.log2(1))+1); // allocate array size D(H.n)
   var current = this.min;
-
 
   //and set while loop until the root loops back
   while(degreeCheck[current.degree]!== current){
@@ -152,7 +149,8 @@ FibonacciHeap.prototype.consolidate = function(){
       }
 
     }else{
-      if(current.key<newMin.key){
+
+      if(current.key<=newMin.key){//must update new min newMin with <= because the newMin may been a put as a child of a root node based on duplicate
         newMin = current;
       }
       degreeCheck[current.degree] = current;
@@ -161,6 +159,7 @@ FibonacciHeap.prototype.consolidate = function(){
   }
 
   this.min = newMin;
+
 };
 
 
@@ -182,17 +181,82 @@ FibHeapNode.prototype.appendChild = function(child){
 };
 
 
+FibonacciHeap.prototype.decreaseKey = function(node,newKey){
+  if(newKey > node.key){
+    console.log("cannot increase key!");
+    return;
+  }
+  node.key = newKey;
+  var parent = node.parent;
+  if(parent && node.key < parent.key){
+    this.cut(node, parent);
+    this.cascadingCut(parent);
+  }
+
+  if(node.key < this.min.key){
+    this.min = node;
+  }
+
+};
+
+
+FibonacciHeap.prototype.cut = function(node, parent){
+
+
+  if(node.next===node){ //removing the node
+    node.parent.child = undefined;
+  }else{
+    node.next.previous = node.previous;
+    node.previous.next = node.next;
+    node.parent.child = node.next;
+  }
+  //decrement parent degree
+  node.parent.degree-=1;
+
+
+  node.next = this.min; //put the cut node on the root list
+  node.previous = this.min.previous;
+  this.min.previous.next = node;
+  this.min.previous = node;
+
+  node.parent = undefined;//set parent to none
+  node.mark = false; //reset mark
+};
+
+FibonacciHeap.prototype.cascadingCut = function(node){
+  parent = node.parent;
+  if(parent){
+    if(node.mark===false){
+      node.mark = true;
+    }else{
+      this.cut(node);
+      this.cascadingCut(parent);
+    }
+  }
+};
+
+
+FibonacciHeap.prototype.deleteNode = function(node){
+  this.decreaseKey(node, Number.NEGATIVE_INFINITY);
+  var deleted = this.takeMin();
+  //return deleted;
+};
+
 var heap = new FibonacciHeap();
   heap.insert(1,{});
 
-  for(var i = 1; i < 100000; i++){
+  for(var i = 1; i < 10; i++){
     heap.insert(i,i+" key");
   }
 
-  for(var i = 1; i < 100000; i++){
-    console.log(heap.takeMin().key);
+
+  var t = heap.insert(6,"im mr meseeks");
+    var b = heap.insert(5,"im mr 5");
+console.log(heap.decreaseKey(t,1));
+console.log(heap.takeMin().content);
+console.log(heap.deleteNode(b));
+
+  for(var i = 1; i < 11; i++){
+
+    console.log(i+".  ",heap.takeMin().content);
   }
-
-
-
-console.log(heap.min)
