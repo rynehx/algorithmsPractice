@@ -281,7 +281,7 @@ tree.insert(15, {content: "i am a object"});
 // tree.insert(13, {content: "i am a object"});
 // tree.insert(12, {content: "i am a object"});
 // tree.insert(17, {content: "i am a object"});
-  console.log(tree)
+  console.log(tree);
 
 //
 //
