@@ -28,23 +28,22 @@ AVLTree.prototype.insert = function(key, content){ //AVL tree class method to in
     return;
   }
 
-  TreeNode.insertNode(this.root, newNode);
+  TreeNode.insertNode(this.root, newNode, this);
 
 
 };
 
-TreeNode.insertNode = function(node, newNode){ // tree node helper method for inserting a node
+TreeNode.insertNode = function(node, newNode, tree){ // tree node helper method for inserting a node
+
     if(newNode.key < node.key){ //go left
 
       if(node.leftChild.key){
+        TreeNode.insertNode(node.leftChild, newNode, tree);
 
-        TreeNode.insertNode(node.leftChild, newNode);
-        this.checkBalance();
-
+        node.checkBalance(tree);
       }else{
-
         node.leftChild = newNode;
-        node.parent = node;
+        newNode.parent = node;
         if(node.degree === 0){
           node.degree = 1;
         }
@@ -53,12 +52,13 @@ TreeNode.insertNode = function(node, newNode){ // tree node helper method for in
     }else{ //go right
 
       if(node.rightChild.key){
-        TreeNode.insertNode(node.rightChild, newNode);
-        this.checkBalance();
+        TreeNode.insertNode(node.rightChild, newNode, tree);
+
+        node.checkBalance(tree);
       }else{
 
         node.rightChild = newNode;
-        node.parent = node;
+        newNode.parent = node;
         if(node.degree === 0){
           node.degree = 1;
         }
@@ -69,18 +69,102 @@ TreeNode.insertNode = function(node, newNode){ // tree node helper method for in
 
 
 
-TreeNode.prototype.checkBalance = function(){ // check if node is balanced to maintain AVL invariant
-  if(Math.abs(this.leftChild.degree - this.rightChild.degree)>1){// subtree is unbalanced -- rebalance here
+TreeNode.prototype.checkBalance = function(tree){ // check if node is balanced to maintain AVL invariant
 
+  if(Math.abs(this.leftChild.degree - this.rightChild.degree)>1){// subtree is unbalanced -- rebalance here
+    if(this.leftChild.degree>this.rightChild.degree){ // left child heavier
+
+      if(this.leftChild.leftChild.degree > this.leftChild.rightChild.degree ){ //left left heavy -- 1 right rotate;
+        TreeNode.rightRotate(this, tree);
+      }else{ // zig zag left-right heavy -- left rotate on sub node then right rotate
+
+        // tree.printTree();
+        // console.log("____________________");
+        TreeNode.leftRotate(this.leftChild, tree);
+        // tree.printTree();
+        TreeNode.rightRotate(this, tree);
+      }
+
+    }else{
+
+      if(this.rightChild.rightChild.degree > this.rightChild.leftChild.degree ){ //right - right heavy - one left rotate
+        TreeNode.leftRotate(this, tree);
+      }else{ // zig zag right - left heavy. right rotate on sub node and left rotate on main.
+        TreeNode.rightRotate(this.rightChild, tree);
+        TreeNode.leftRotate(this, tree);
+      }
+
+    }
   }else{//update the height of the subroot
 
-    if(this.leftChild.degree > this.rightChild.degree){
-      this.degree = this.leftChild.degree + 1;
-    }else{
-      this.degree = this.rightChild.degree + 1;
-    }
+    TreeNode.updateDegree(this);
+
   }
 };
+
+
+
+TreeNode.updateDegree = function(node){
+  if(node.leftChild.degree > node.rightChild.degree){
+    node.degree = node.leftChild.degree + 1;
+  }else{
+    node.degree = node.rightChild.degree + 1;
+  }
+};
+
+
+TreeNode.leftRotate = function(A, tree){ //A is original top node, B is original bottom node
+
+var B = A.rightChild;
+  if(A.parent){
+    if(A.parent.leftChild === A){//assign B as child of the parent of A// Assign A parent to B parent
+      A.parent.leftChild = B;
+    }else{
+      A.parent.rightChild = B;
+    }
+    B.parent = A.parent;
+  }else{
+    B.parent = undefined; // if A was root then B is now a root;
+    tree.root = B;
+  }
+
+A.parent = B; //A parent becomes B
+A.rightChild = B.leftChild; // B left child is now A right child
+B.leftChild.parent = A;//B left child parent is pointed to A
+B.leftChild = A; //finally B left child is A
+
+TreeNode.updateDegree(A);//update the new degree of both nodes
+TreeNode.updateDegree(B);//B updates last because A is lower in tree
+};
+
+TreeNode.rightRotate = function(A, tree){ //A is original top node, B is original bottom node
+
+  var B = A.leftChild;
+
+  if(A.parent){
+    if(A.parent.leftChild === A){//assign B as child of the parent of A// Assign A parent to B parent
+      A.parent.leftChild = B;
+    }else{
+      A.parent.rightChild = B;
+    }
+    B.parent = A.parent;
+  }else{
+    B.parent = undefined; // if A was root then B is now a root;
+    tree.root = B;
+  }
+
+A.parent = B; //A parent becomes B
+A.leftChild = B.rightChild;
+B.rightChild.parent = A;
+B.rightChild = A;
+
+TreeNode.updateDegree(A);//update the new degree of both nodes
+TreeNode.updateDegree(B);//B updates last because A is lower in tree
+
+};
+
+
+
 
 
 AVLTree.prototype.printTree = function(){
@@ -106,7 +190,8 @@ AVLTree.prototype.printTree = function(){
     print(this.root,this.root.degree);
 
     for(var i = tree.length - 1; i>=0; i--){
-      console.log(tree[i].join(" "));
+    //  console.log(tree[i].join(" "));
+      console.log(i,tree[i].length);
     }
     return tree;
 };
@@ -125,9 +210,22 @@ AVLTree.prototype.printTree = function(){
 
 
 var tree = new AVLTree();
-for(var i = 0; i <= 10; i++){
+for(var i = 0; i <= 1000000; i++){
   tree.insert(Math.floor(Math.random()*100),"I got put in order " + i );
+  //tree.insert(i,"I got put in order " + i );
 }
+//
+// tree.insert(10,"1st");
+// tree.insert(12,"2nd");
+// tree.insert(9,"3rd");
+// tree.insert(8,"4th");
+// tree.insert(7,"5th");
+//  tree.insert(7,"5th");
+//  tree.insert(7,"5th");
 
 
 tree.printTree();
+
+console.log(tree.root.leftChild.degree);
+console.log(tree.root.rightChild.degree);
+console.log(tree.root.degree);
