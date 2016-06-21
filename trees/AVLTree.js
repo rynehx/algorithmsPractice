@@ -214,14 +214,8 @@ for(var i = 0; i <= 1000000; i++){
   tree.insert(Math.floor(Math.random()*100),"I got put in order " + i );
   //tree.insert(i,"I got put in order " + i );
 }
-//
-// tree.insert(10,"1st");
-// tree.insert(12,"2nd");
-// tree.insert(9,"3rd");
-// tree.insert(8,"4th");
-// tree.insert(7,"5th");
-//  tree.insert(7,"5th");
-//  tree.insert(7,"5th");
+
+
 
 
 tree.printTree();
