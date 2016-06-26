@@ -105,12 +105,20 @@ Trie.prototype.navigates = function(word){
   return current;
 };
 
+Trie.prototype.isPrefix = function(word){
+  if(this.navigates(word)){
+    return true;
+  }else{
+    return false;
+  }
+};
+
 
 
 var dictionary = new Trie();
 dictionary.inject("brooms");
 dictionary.inject("broom");
-dictionary.inject("bro");
+
 dictionary.inject("broomses");
 dictionary.inject("broomseewrwe");
 dictionary.searches("brooms");
@@ -124,3 +132,7 @@ dictionary.delete("bro");
 dictionary.searches("bro");
 dictionary.delete("broomses");
 dictionary.searches("broomses");
+
+
+
+dictionary.isPrefix("broom");
