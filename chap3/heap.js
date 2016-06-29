@@ -106,7 +106,7 @@ Heap.prototype.heapifyDown = function(idx){
         this.heapifyDown(child[1]);
       }
     }else if(this.type==="max"){
-      var child = getMax(this.children[idx],this.store);
+      var child = getMax(this.children(idx),this.store);
       if(this.store[idx]<child[0]){
         var current = this.store[idx];
         this.store[idx] = child[0];
@@ -148,13 +148,13 @@ Heap.prototype.visual = function(){
 };
 
 var heap = new Heap("min");
-for(var i =0; i<100;i++){
-  heap.insert(Math.floor(Math.random()*20));
+for(var i =0; i<20;i++){
+  heap.insert(Math.floor(Math.random()*50)+50);
 }
 
 heap.visual();
 
-for(var i =0; i<100;i++){
+for(var i =0; i<10;i++){
   console.log(heap.removeMin());
 }
 
