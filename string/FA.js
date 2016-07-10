@@ -1,3 +1,3 @@
-var finiteAutomata = function(){
+ var finiteAutomata = function(){
 e
 };
